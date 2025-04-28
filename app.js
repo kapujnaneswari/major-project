@@ -34,11 +34,9 @@ main()
   });
 
 async function main() {
-  await mongoose.connect(dbUrl, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-}
+  await mongoose.connect(dbUrl);
+};
+
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -50,12 +48,12 @@ app.use(express.static(path.join(__dirname,"/public")));
 const store = MongoStore.create({
   mongoUrl: dbUrl,
   crypto: {
-    secret:process.env.SECRET,
+    secret: process.env.SECRET,
   },
   touchAfter: 24 * 3600,
 });
 
-store.on("error", function(err) {
+store.on("error", () => {
   console.log("ERROR in MONGO SESSION STORE", err);
 });
 
