@@ -2,6 +2,7 @@ if(process.env.NODE_ENV != "production") {
   require('dotenv').config();
 };
 
+
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -20,6 +21,7 @@ const listingRouter = require("./routes/listing.js");
 const reviewRouter =require("./routes/review.js");
 const userRouter =require("./routes/user.js");
 
+
 // const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 const dbUrl = process.env.ATLASDB_URL;
 
@@ -32,7 +34,10 @@ main()
   });
 
 async function main() {
-  await mongoose.connect(dbUrl);
+  await mongoose.connect(dbUrl, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
 }
 
 app.set("view engine", "ejs");
@@ -50,10 +55,14 @@ const store = MongoStore.create({
   touchAfter: 24 * 3600,
 });
 
-store.on("error", () => {
-  console.log("ERROR in MONGO SESSION STORE" , err);
+store.on("error", function(err) {
+  console.log("ERROR in MONGO SESSION STORE", err);
 });
 
+
+// app.get("/", (req, res) => {
+//   res.send("Hi, I am root");
+// });
 const sessionOptions = {
   store,
   secret: process.env.SECRET,
@@ -65,11 +74,6 @@ const sessionOptions = {
     httpOnly: true,
   },
 };
-
-// app.get("/", (req, res) => {
-//   res.send("Hi, I am root");
-// });
-
 
 app.use(session(sessionOptions));
 app.use(flash());
@@ -113,6 +117,6 @@ app.use((err,req,res,next)=>{
   // res.status(statusCode).send(message);
 });
 
-app.listen(8080,()=>{
-    console.log("server is listening to port 8080");
+app.listen(8080, () => {
+  console.log("server is listening to port 8080");
 });
